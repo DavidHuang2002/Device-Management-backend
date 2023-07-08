@@ -1,0 +1,6 @@
+# Build and Release Folders
+obj/
+bin/
+
+# project files
+.vs/

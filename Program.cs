@@ -11,8 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 //);
 
 // config for using inMemory DB for testing
-builder.Services.AddDbContext<DeviceManagementDbContext>(opt =>
-    opt.UseInMemoryDatabase("TestDb"));
+//builder.Services.AddDbContext<DeviceManagementDbContext>(opt =>
+//    opt.UseInMemoryDatabase("TestDb"));
 
 // Add services to the container.
 
@@ -24,6 +24,22 @@ builder.Services.AddCors();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+var connection = String.Empty;
+//builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
+//connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
+    connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+}
+else
+{
+    connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
+}
+
+builder.Services.AddDbContext<DeviceManagementDbContext>(options =>
+    options.UseSqlServer(connection));
 
 var app = builder.Build();
 

@@ -47,6 +47,9 @@ public partial class DeviceManagementDbContext : DbContext
             entity.Property(e => e.Type)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.Type)
+                .HasMaxLength(50)
+                .IsUnicode(true);
         });
 
         OnModelCreatingPartial(modelBuilder);

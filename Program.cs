@@ -17,6 +17,10 @@ builder.Services.AddDbContext<DeviceManagementDbContext>(opt =>
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+// Add CORS services.
+builder.Services.AddCors();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -30,7 +34,21 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Configure the HTTP request pipeline.
+if (app.Environment.IsProduction())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseHttpsRedirection();
+
+// Use CORS policy before UseRouting and other middleware
+app.UseCors(builder =>
+    builder
+        .WithOrigins("http://127.0.0.1:5173") // replace with the origin you want to allow
+        .AllowAnyMethod()
+        .AllowAnyHeader());
 
 app.UseAuthorization();
 

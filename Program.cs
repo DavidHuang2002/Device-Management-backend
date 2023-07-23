@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Device_Management.Models;
+using Azure.Messaging.ServiceBus;
+using Device_Management.Services;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +18,6 @@ var builder = WebApplication.CreateBuilder(args);
 //    opt.UseInMemoryDatabase("TestDb"));
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 
 // Add CORS services.
@@ -25,21 +27,28 @@ builder.Services.AddCors();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var connection = String.Empty;
+var dbConnection = String.Empty;
 //builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
 //connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
 if (builder.Environment.IsDevelopment())
 {
     builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
-    connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+    dbConnection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
 }
 else
 {
-    connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
+    dbConnection = Environment.GetEnvironmentVariable("SQLAZURECONNSTR_AZURE_SQL_CONNECTIONSTRING");
 }
 
 builder.Services.AddDbContext<DeviceManagementDbContext>(options =>
-    options.UseSqlServer(connection));
+    options.UseSqlServer(dbConnection));
+
+
+builder.Services.AddSingleton(new ServiceBusClient(Configuration.GetConnectionString("ServiceBusConnection")));
+builder.Services.AddHostedService<ServiceBusReceiverHostedService>();
+
+
+
 
 var app = builder.Build();
 

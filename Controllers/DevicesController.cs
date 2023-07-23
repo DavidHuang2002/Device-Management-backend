@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Device_Management.Models;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace Device_Management.Controllers
 {
@@ -47,6 +48,54 @@ namespace Device_Management.Controllers
             }
 
             return device;
+        }
+
+        // GET: api/Devices/search?name={name}&type={type}&status={status}&startDate={startDate}&endDate={endDate}
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Device>>> SearchDevices(string? name, string? type, string? status, DateTime? startDate, DateTime? endDate)
+        {
+            if (_context.Devices == null)
+            {
+                return NotFound();
+            }
+
+            var devices = _context.Devices.AsQueryable();
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                
+                devices = devices.Where(d => d.Name != null && d.Name.Contains(name));
+            }
+
+            // TODO: Look like there is trouble with Contains.
+            if (!string.IsNullOrEmpty(type))
+            {
+                devices = devices.Where(d => d.Type.Contains(type));
+            }
+
+            if (!string.IsNullOrEmpty(status))
+            {
+                devices = devices.Where(d => d.Status.Contains(status));
+            }
+
+            if (startDate.HasValue)
+            {
+                devices = devices.Where(d => d.LastCheckInTime >= startDate.Value);
+            }
+
+            if (endDate.HasValue)
+            {
+                devices = devices.Where(d => d.LastCheckInTime <= endDate.Value);
+            }
+
+            var result = await devices.ToListAsync();
+
+            //if (!result.Any())
+            //{
+            //    return NotFound();
+            //}
+
+            return result;
         }
 
         // PUT: api/Devices/5

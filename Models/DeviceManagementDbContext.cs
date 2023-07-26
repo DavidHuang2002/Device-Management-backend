@@ -17,6 +17,7 @@ public partial class DeviceManagementDbContext : DbContext
     }
 
     public virtual DbSet<Device> Devices { get; set; }
+    public virtual DbSet<Alert> Alerts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -50,6 +51,19 @@ public partial class DeviceManagementDbContext : DbContext
             entity.Property(e => e.Type)
                 .HasMaxLength(50)
                 .IsUnicode(true);
+        });
+
+        modelBuilder.Entity<Alert>(entity => // Adding Alert model configuration
+        {
+            entity.ToTable("Alert");
+
+            entity.Property(e => e.DeviceId).HasMaxLength(255);
+            entity.Property(e => e.Severity).HasMaxLength(255);
+            entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.Status).HasMaxLength(255);
+            entity.Property(e => e.AcknowledgedBy).HasMaxLength(255);
+            entity.Property(e => e.ResolvedBy).HasMaxLength(255);
+            entity.Property(e => e.AdditionalInfo).HasColumnType("nvarchar(max)");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -3,6 +3,9 @@ using Device_Management.Models;
 using Azure.Messaging.ServiceBus;
 using Device_Management.Services;
 using System.Configuration;
+using Device_Management.Services.Email;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.CodeAnalysis.Emit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,12 +31,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var dbConnection = String.Empty;
+var serviceBusConnection = String.Empty;
+var emailConnection = String.Empty;
 //builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
 //connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
 if (builder.Environment.IsDevelopment())
 {
     builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
     dbConnection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+    serviceBusConnection = builder.Configuration.GetConnectionString("AZURE_SERVICE_BUS_SAS_CONNECTIONSTR");
+    emailConnection = builder.Configuration.GetConnectionString("AZURE_COMMUNICATION_CONNECTIONSTR");
 }
 else
 {
@@ -44,10 +51,16 @@ builder.Services.AddDbContext<DeviceManagementDbContext>(options =>
     options.UseSqlServer(dbConnection));
 
 
-builder.Services.AddSingleton(new ServiceBusClient(Configuration.GetConnectionString("ServiceBusConnection")));
+// Register the EmailOptions in the dependency injection container
+builder.Services.Configure<EmailOptions>(options =>
+{
+    options.ConnectionString = emailConnection;
+});
+
+builder.Services.AddSingleton<IEmailService, EmailService>();
+
+builder.Services.AddSingleton(new ServiceBusClient(serviceBusConnection));
 builder.Services.AddHostedService<ServiceBusReceiverHostedService>();
-
-
 
 
 var app = builder.Build();

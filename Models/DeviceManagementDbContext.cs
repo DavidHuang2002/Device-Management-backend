@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Device_Management.Models.DeviceUpdate;
 using Microsoft.EntityFrameworkCore;
 
 namespace Device_Management.Models;
@@ -19,6 +20,8 @@ public partial class DeviceManagementDbContext : DbContext
     public virtual DbSet<Device> Devices { get; set; }
     public virtual DbSet<Alert> Alerts { get; set; }
     public virtual DbSet<RaspberryPi> RaspberryPi { get; set; }
+
+    public DbSet<RaspberryPiUpdate> RaspberryPiUpdates { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -73,6 +76,9 @@ public partial class DeviceManagementDbContext : DbContext
             entity.Property(e => e.Temperature).HasColumnType("float");
             entity.Property(e => e.Humidity).HasColumnType("float");
         });
+
+        // This will set the table name for the RaspberryPiUpdate entity.
+        modelBuilder.Entity<RaspberryPiUpdate>().ToTable("RaspberryPiUpdate");
 
 
         OnModelCreatingPartial(modelBuilder);

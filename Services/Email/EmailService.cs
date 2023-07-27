@@ -27,7 +27,7 @@ namespace Device_Management.Services.Email
 
         public async Task SendAlertEmailAsync(float temperature, JObject? message)
         {
-            var deviceId = "placeholder";
+            var deviceId = message.ContainsKey("deviceId") ? message["deviceId"].Value<int>() : (int?)null; ;
             var subject = "Abnormal Temperature Alert";
             var htmlContent = $"<html><body><h1>{subject}</h1><br/><h4>Abnormal temperature {temperature} detected on device {deviceId}.</h4><p>full message info: {message}</p></body></html>";
             var sender = "DoNotReply@85598235-8fc4-4184-a4d5-d7c14c6f4cbf.azurecomm.net";

@@ -1,4 +1,5 @@
 using Device_Management.Models;
+using Device_Management.Models.DeviceUpdate;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
@@ -36,6 +37,7 @@ namespace Device_Management.Services
             }
 
             // Step 4: Update the lastCheckIn time of the device in the device table
+            // TODO use the time in message as LastCheckinTime
             device.LastCheckInTime = DateTime.Now;
 
             // Step 5: Save changes to the database
@@ -51,6 +53,10 @@ namespace Device_Management.Services
             // Step 2: Check if an entry with the given deviceId exists in the RaspberryPi table
             var raspberryPi = await _context.RaspberryPi.FirstOrDefaultAsync(rp => rp.Id == deviceId);
 
+            // TODO extract it into a helper method 
+            var temperature = newState.ContainsKey("temperature") ? newState["temperature"].Value<float>() : (float?)null;
+            var humidity = newState.ContainsKey("humidity") ? newState["humidity"].Value<float>() : (float?)null;
+
             // Step 3: Update or create a new entry in the RaspberryPi table based on newState
             if (raspberryPi == null)
             {
@@ -58,16 +64,25 @@ namespace Device_Management.Services
                 raspberryPi = new RaspberryPi
                 {
                     Id = deviceId,
-                    Temperature = newState.ContainsKey("temperature") ? newState["temperature"].Value<float>() : (float?)null,
-                    Humidity = newState.ContainsKey("humidity") ? newState["humidity"].Value<float>() : (float?)null
+                    Temperature = temperature,
+                    Humidity = humidity
                 };
                 _context.RaspberryPi.Add(raspberryPi);
             }
             else
             {
-                raspberryPi.Temperature = newState.ContainsKey("temperature") ? newState["temperature"].Value<float>() : raspberryPi.Temperature;
-                raspberryPi.Humidity = newState.ContainsKey("humidity") ? newState["humidity"].Value<float>() : raspberryPi.Humidity;
+                raspberryPi.Temperature = temperature;
+                raspberryPi.Humidity = humidity;
             }
+
+            var update = new RaspberryPiUpdate {
+                DeviceId = deviceId,
+                // TODO use the time in message as LastCheckinTime
+                Timestamp = DateTime.Now,
+                Temperature = temperature,
+                Humidity = humidity
+            };
+            _context.RaspberryPiUpdates.Add(update);
 
             return raspberryPi;
         }

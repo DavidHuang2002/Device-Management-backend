@@ -47,7 +47,7 @@ namespace Device_Management.Services
             if (jsonMessage["temperature"] != null && float.TryParse(jsonMessage["temperature"].ToString(), out float temperature))
             {
                 //Console.WriteLine($"temperature reading {temperature}");
-                if (temperature >= 32)
+                if (temperature >= 31.5)
                 {
                     // TODO store the alert info in a table
                     // insert -- level: important, date: now, status: unacknowledged, desc: device over heat
@@ -62,13 +62,14 @@ namespace Device_Management.Services
                     };
 
                     await alertService.CreateAlert(alert);
+                    Console.WriteLine($"Stored the alert info in the database. Alert: {alert.ToJson()}");
 
-                    // TODO to send email and insert Alert at the same time
+                    // TODO dont send alert if two anormaly is too close
 
                     Console.WriteLine($"Sending alert email!!!! temperature: {temperature}");
-                    // Use the email service to send the alert email
-                    await _emailService.SendAlertEmailAsync(temperature, jsonMessage);
-                    Console.WriteLine($"Stored the alert info in the database. Alert: {alert.ToJson()}");
+                    // Use the email service to send the alert email.
+                    // takes a long time so do not await
+                    _emailService.SendAlertEmailAsync(temperature, jsonMessage);
                 }
             } else {
                 Console.WriteLine("---No temperarure found in message---");

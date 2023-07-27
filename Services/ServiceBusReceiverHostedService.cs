@@ -1,7 +1,9 @@
 using Azure.Messaging.ServiceBus;
+using Device_Management.Models;
 using Device_Management.Services.Email;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NuGet.Protocol;
 
 namespace Device_Management.Services
 {
@@ -9,11 +11,13 @@ namespace Device_Management.Services
     {
         private ServiceBusProcessor _processor;
         private readonly IEmailService _emailService;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public ServiceBusReceiverHostedService(ServiceBusClient serviceBusClient, IEmailService emailService)
+        public ServiceBusReceiverHostedService(ServiceBusClient serviceBusClient, IEmailService emailService, IServiceScopeFactory serviceScopeFactory)
         {
             _processor = serviceBusClient.CreateProcessor("devices", new ServiceBusProcessorOptions());
             _emailService = emailService;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -27,27 +31,46 @@ namespace Device_Management.Services
 
         private async Task MessageHandler(ProcessMessageEventArgs args)
         {
+            using var scope = _serviceScopeFactory.CreateScope();
+            var alertService = scope.ServiceProvider.GetRequiredService<AlertService>();
+            var deviceService = scope.ServiceProvider.GetRequiredService<DeviceService>();
+
             string body = args.Message.Body.ToString();
             Console.WriteLine("message received!");
             Console.WriteLine($"Received: {body}");
             var jsonMessage = JObject.Parse(body);
 
+            if (jsonMessage["deviceId"] != null && int.TryParse(jsonMessage["deviceId"].ToString(), out int deviceId)) {
+                await deviceService.UpdateDeviceStateAsync(deviceId, jsonMessage);
+            }
+
             if (jsonMessage["temperature"] != null && float.TryParse(jsonMessage["temperature"].ToString(), out float temperature))
             {
                 //Console.WriteLine($"temperature reading {temperature}");
-                if (temperature >= 30)
+                if (temperature >= 32)
                 {
-                    // TOOO: send an email
+                    // TODO store the alert info in a table
+                    // insert -- level: important, date: now, status: unacknowledged, desc: device over heat
+                    var alert = new Alert
+                    {
+                        // TODO handle the case where DeviceId is not int
+                        DeviceId = (int) jsonMessage["deviceId"],
+                        Timestamp = DateTime.UtcNow,
+                        Severity = "important",
+                        Description = "Device over heat",
+                        Status = "unacknowledged"
+                    };
+
+                    await alertService.CreateAlert(alert);
+
+                    // TODO to send email and insert Alert at the same time
+
                     Console.WriteLine($"Sending alert email!!!! temperature: {temperature}");
                     // Use the email service to send the alert email
                     await _emailService.SendAlertEmailAsync(temperature, jsonMessage);
-
-
-                    // store the alert info in a table
-                    // You will need to define what "storing the alert info in a table" means for your application.
+                    Console.WriteLine($"Stored the alert info in the database. Alert: {alert.ToJson()}");
                 }
-            } else
-            {
+            } else {
                 Console.WriteLine("---No temperarure found in message---");
             }
 

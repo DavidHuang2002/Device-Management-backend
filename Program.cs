@@ -62,6 +62,8 @@ builder.Services.AddSingleton<IEmailService, EmailService>();
 builder.Services.AddSingleton(new ServiceBusClient(serviceBusConnection));
 builder.Services.AddHostedService<ServiceBusReceiverHostedService>();
 
+builder.Services.AddScoped<AlertService>();
+builder.Services.AddScoped<DeviceService>();
 
 var app = builder.Build();
 

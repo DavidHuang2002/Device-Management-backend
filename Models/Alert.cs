@@ -3,7 +3,7 @@ namespace Device_Management.Models
     public partial class Alert
     {
         public int AlertId { get; set; }
-        public string DeviceId { get; set; }
+        public int DeviceId { get; set; }
         public DateTime Timestamp { get; set; }
         public string Severity { get; set; }
         public string Description { get; set; }

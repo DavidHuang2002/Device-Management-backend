@@ -18,6 +18,7 @@ public partial class DeviceManagementDbContext : DbContext
 
     public virtual DbSet<Device> Devices { get; set; }
     public virtual DbSet<Alert> Alerts { get; set; }
+    public virtual DbSet<RaspberryPi> RaspberryPi { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -57,7 +58,7 @@ public partial class DeviceManagementDbContext : DbContext
         {
             entity.ToTable("Alert");
 
-            entity.Property(e => e.DeviceId).HasMaxLength(255);
+            entity.Property(e => e.DeviceId).IsRequired();
             entity.Property(e => e.Severity).HasMaxLength(255);
             entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
             entity.Property(e => e.Status).HasMaxLength(255);
@@ -65,6 +66,14 @@ public partial class DeviceManagementDbContext : DbContext
             entity.Property(e => e.ResolvedBy).HasMaxLength(255);
             entity.Property(e => e.AdditionalInfo).HasColumnType("nvarchar(max)");
         });
+
+        modelBuilder.Entity<RaspberryPi>(entity => 
+        {
+            entity.ToTable("RaspberryPi");
+            entity.Property(e => e.Temperature).HasColumnType("float");
+            entity.Property(e => e.Humidity).HasColumnType("float");
+        });
+
 
         OnModelCreatingPartial(modelBuilder);
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -85,6 +85,7 @@ namespace Device_Management.Controllers
         [HttpPost]
         public async Task<ActionResult<Alert>> PostAlert(Alert alert)
         {
+            // TODO: use Alert Service to create for reducing redundant code
           if (_context.Alerts == null)
           {
               return Problem("Entity set 'DeviceManagementDbContext.Alerts'  is null.");

@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 
+// TODO have a separate service handling the inserting different types of devices. For example adding a raspberryPi type device will also create corresponding entry in raspberryPi table
+// also make sure device type dont change easily
+
 namespace Device_Management.Models;
 
 public partial class Device

@@ -50,6 +50,25 @@ namespace Device_Management.Controllers
             return device;
         }
 
+        // TODO: bad implementation. Better way is to have a Device/State/{id} that can return the state of any type
+        // GET: api/Devices/5
+        [HttpGet("raspberryPi/{id}")]
+        public async Task<ActionResult<Device>> GetRaspberryPi(int id)
+        {
+            if (_context.Devices == null)
+            {
+                return NotFound();
+            }
+            var device = await _context.RaspberryPi.FindAsync(id);
+
+            if (device == null)
+            {
+                return NotFound();
+            }
+
+            return device;
+        }
+
         // GET: api/Devices/search?name={name}&type={type}&status={status}&startDate={startDate}&endDate={endDate}
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<Device>>> SearchDevices(string? name, string? type, string? status, DateTime? startDate, DateTime? endDate)

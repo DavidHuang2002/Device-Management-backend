@@ -4,3 +4,4 @@ bin/
 
 # project files
 .vs/
+/appsettings.Development.json

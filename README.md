@@ -3,3 +3,5 @@
 
 A demo its API endpoint can be find on:
 https://david-device-management.azurewebsites.net/swagger/index.html
+
+![image](https://github.com/DavidHuang2002/Device-Management-backend/assets/55070299/8fbd6532-a856-46e6-94f3-22d7aab688a3)

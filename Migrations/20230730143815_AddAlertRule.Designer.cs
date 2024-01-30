@@ -4,6 +4,7 @@ using Device_Management.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Device_Management.Migrations
 {
     [DbContext(typeof(DeviceManagementDbContext))]
-    partial class DeviceManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230730143815_AddAlertRule")]
+    partial class AddAlertRule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,10 +41,6 @@ namespace Device_Management.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("AdditionalInfo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AlertName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
@@ -74,78 +73,6 @@ namespace Device_Management.Migrations
                     b.HasKey("AlertId");
 
                     b.ToTable("Alert", (string)null);
-                });
-
-            modelBuilder.Entity("Device_Management.Models.AlertManagement.AlertRule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AlertTemplateId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Attribute")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("AttributeDataType")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DeviceId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Operator")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AlertTemplateId");
-
-                    b.HasIndex("DeviceId");
-
-                    b.ToTable("AlertRules");
-                });
-
-            modelBuilder.Entity("Device_Management.Models.AlertManagement.AlertTemplate", b =>
-                {
-                    b.Property<int>("AlertTemplateId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AlertTemplateId"));
-
-                    b.Property<string>("AlertName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AlertTemplateName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Severity")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("AlertTemplateId");
-
-                    b.ToTable("AlertTemplates");
                 });
 
             modelBuilder.Entity("Device_Management.Models.Device", b =>
@@ -247,23 +174,6 @@ namespace Device_Management.Migrations
                     b.ToTable("RaspberryPi", (string)null);
                 });
 
-            modelBuilder.Entity("Device_Management.Models.AlertManagement.AlertRule", b =>
-                {
-                    b.HasOne("Device_Management.Models.AlertManagement.AlertTemplate", "AlertTemplate")
-                        .WithMany()
-                        .HasForeignKey("AlertTemplateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Device_Management.Models.Device", null)
-                        .WithMany("AlertRules")
-                        .HasForeignKey("DeviceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AlertTemplate");
-                });
-
             modelBuilder.Entity("Device_Management.Models.RaspberryPi", b =>
                 {
                     b.HasOne("Device_Management.Models.Device", null)
@@ -271,11 +181,6 @@ namespace Device_Management.Migrations
                         .HasForeignKey("Device_Management.Models.RaspberryPi", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Device_Management.Models.Device", b =>
-                {
-                    b.Navigation("AlertRules");
                 });
 #pragma warning restore 612, 618
         }

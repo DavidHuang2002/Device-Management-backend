@@ -60,7 +60,6 @@ namespace Device_Management.Services
             // Step 3: Update or create a new entry in the RaspberryPi table based on newState
             if (raspberryPi == null)
             {
-                // TODO: has bugs
                 raspberryPi = new RaspberryPi
                 {
                     Id = deviceId,

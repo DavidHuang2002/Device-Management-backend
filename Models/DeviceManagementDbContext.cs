@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Device_Management.Models.AlertManagement;
 using Device_Management.Models.DeviceUpdate;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,8 @@ public partial class DeviceManagementDbContext : DbContext
 
     public virtual DbSet<Device> Devices { get; set; }
     public virtual DbSet<Alert> Alerts { get; set; }
+    public DbSet<AlertRule> AlertRules { get; set; }
+    public DbSet<AlertTemplate> AlertTemplates { get; set; }
     public virtual DbSet<RaspberryPi> RaspberryPi { get; set; }
 
     public DbSet<RaspberryPiUpdate> RaspberryPiUpdates { get; set; }

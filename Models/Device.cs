@@ -1,3 +1,4 @@
+using Device_Management.Models.AlertManagement;
 using System;
 using System.Collections.Generic;
 
@@ -29,4 +30,6 @@ public partial class Device
     public string? AzureDeviceKey { get; set; }
 
     public string? AzureConnectionString { get; set; }
+
+    public ICollection<AlertRule>? AlertRules { get; set; }
 }

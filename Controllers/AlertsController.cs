@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Device_Management.Models;
+using Device_Management.Models.AlertManagement;
 
 namespace Device_Management.Controllers
 {

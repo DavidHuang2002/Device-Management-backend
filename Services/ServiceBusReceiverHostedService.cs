@@ -1,5 +1,5 @@
 using Azure.Messaging.ServiceBus;
-using Device_Management.Models;
+using Device_Management.Models.AlertManagement;
 using Device_Management.Services.Email;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -40,9 +40,22 @@ namespace Device_Management.Services
             Console.WriteLine($"Received: {body}");
             var jsonMessage = JObject.Parse(body);
 
-            if (jsonMessage["deviceId"] != null && int.TryParse(jsonMessage["deviceId"].ToString(), out int deviceId)) {
-                await deviceService.UpdateDeviceStateAsync(deviceId, jsonMessage);
+            int deviceId;
+            if (jsonMessage["deviceId"] == null)
+            {
+                throw new ArgumentException($"message {jsonMessage} is not valid -- it does not have deviceId associated with it");
+            } else
+            {
+                if(!int.TryParse(jsonMessage["deviceId"].ToString(), out deviceId))
+                {
+                    throw new ArgumentException($"message {jsonMessage} is not valid -- its deviceId is not int type");
+                }
             }
+           
+            await deviceService.UpdateDeviceStateAsync(deviceId, jsonMessage);
+            var newAlert = await alertService.CheckAlertRules(deviceId, jsonMessage);
+
+            // TODO: make emailing service send email based on alert
 
             if (jsonMessage["temperature"] != null && float.TryParse(jsonMessage["temperature"].ToString(), out float temperature))
             {

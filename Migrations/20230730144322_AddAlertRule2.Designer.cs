@@ -4,6 +4,7 @@ using Device_Management.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Device_Management.Migrations
 {
     [DbContext(typeof(DeviceManagementDbContext))]
-    partial class DeviceManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230730144322_AddAlertRule2")]
+    partial class AddAlertRule2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,10 +41,6 @@ namespace Device_Management.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("AdditionalInfo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AlertName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
@@ -91,12 +90,6 @@ namespace Device_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("AttributeDataType")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DeviceId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -111,8 +104,6 @@ namespace Device_Management.Migrations
 
                     b.HasIndex("AlertTemplateId");
 
-                    b.HasIndex("DeviceId");
-
                     b.ToTable("AlertRules");
                 });
 
@@ -123,10 +114,6 @@ namespace Device_Management.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AlertTemplateId"));
-
-                    b.Property<string>("AlertName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AlertTemplateName")
                         .HasColumnType("nvarchar(max)");
@@ -255,12 +242,6 @@ namespace Device_Management.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Device_Management.Models.Device", null)
-                        .WithMany("AlertRules")
-                        .HasForeignKey("DeviceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("AlertTemplate");
                 });
 
@@ -271,11 +252,6 @@ namespace Device_Management.Migrations
                         .HasForeignKey("Device_Management.Models.RaspberryPi", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Device_Management.Models.Device", b =>
-                {
-                    b.Navigation("AlertRules");
                 });
 #pragma warning restore 612, 618
         }

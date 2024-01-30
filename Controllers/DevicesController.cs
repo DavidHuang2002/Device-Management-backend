@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Device_Management.Models;
 using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
+using Device_Management.Models.AlertManagement;
 
 namespace Device_Management.Controllers
 {
@@ -32,6 +33,8 @@ namespace Device_Management.Controllers
             return await _context.Devices.ToListAsync();
         }
 
+        // TODO add a controller to get with alertRule included
+
         // GET: api/Devices/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Device>> GetDevice(int id)
@@ -50,8 +53,21 @@ namespace Device_Management.Controllers
             return device;
         }
 
+        // GET: api/Devices/5/alertRules
+        [HttpGet("{id}/alertRules")]
+        public async Task<ActionResult<IEnumerable<AlertRule>>> GetAlertRulesForDevice(int id)
+        {
+            if (_context.Devices == null)
+            {
+                Console.WriteLine("Devices not found");
+                return NotFound();
+            }
+            var rules = await _context.AlertRules.Where(ar => ar.DeviceId == id).Include(ar => ar.AlertTemplate).ToListAsync();
+
+            return rules;
+        }
+
         // TODO: bad implementation. Better way is to have a Device/State/{id} that can return the state of any type
-        // GET: api/Devices/5
         [HttpGet("raspberryPi/{id}")]
         public async Task<ActionResult<Device>> GetRaspberryPi(int id)
         {
@@ -86,7 +102,6 @@ namespace Device_Management.Controllers
                 devices = devices.Where(d => d.Name != null && d.Name.Contains(name));
             }
 
-            // TODO: Look like there is trouble with Contains.
             if (!string.IsNullOrEmpty(type))
             {
                 devices = devices.Where(d => d.Type.Contains(type));
